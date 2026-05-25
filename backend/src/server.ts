@@ -24,16 +24,13 @@ if (process.env.FRONTEND_URL) {
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
       console.warn(`Blocked by CORS: ${origin}`);
-      callback(null, true); // Temporarily allow all for deployment debugging, or strictly enforce it
-      // Replace the above line with callback(new Error('Not allowed by CORS')); for strict production
-    }
+      callback(null, true); }
   },
   credentials: true
 }));
@@ -41,6 +38,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static('uploads'));
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/borrower', borrowerRoutes);
